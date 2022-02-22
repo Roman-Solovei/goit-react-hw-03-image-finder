@@ -8,7 +8,7 @@ export default function Searchbar({ setQuery, searchQueryValue, searchReset }) {
         <header className={ s.Searchbar }>
         <form className={ s.SearchForm } onSubmit={searchReset}>
             <button type="submit" className={s.SearchFormButton} >
-                <FcSearch style={{width:50}}/> <span className={s.SearchFormButtonLabel}>Search</span>
+                <FcSearch style={{ width: 25, height: 25 }}/> <span className={s.SearchFormButtonLabel}>Search</span>
             </button>
 
             <input
@@ -24,4 +24,10 @@ export default function Searchbar({ setQuery, searchQueryValue, searchReset }) {
         </form>
         </header>
     )
+};
+
+Searchbar.propTypes = {
+    setQuery: PropTypes.func.isRequired,
+    searchQueryValue: PropTypes.string.isRequired,
+    searchReset: PropTypes.func.isRequired
 }

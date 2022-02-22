@@ -1,60 +1,83 @@
 import React, { Component } from "react";
 import "./App.module.css"
-import Searchbar from "./Searchbar/Searchbar"
-import Button from "./Button/Button";
-
-// const axios = require('axios').default;
+import Searchbar from "./Searchbar"
+import ImageGallery from "./ImageGallery"
+import Button from "./Button";
+import Loader from "./Loader"
+// import Modal from "./Modal/Modal"
 
 
 export default class App extends Component { 
     state = {
-        panding: true,
+        pending: false,
         page: 1,
         pagination: 12,
         searchQuery: "",
         key: "24779492-e45231f5fdfd8f5bb8624d13c",
         mainUrl: "https://pixabay.com/api/",
-        searchSettings: "?image_type=photo&orientation=horizontal&safesearch=true&",
-        error: null,
-        images:[],
+        searchSettings: "?image_type=photo&orientation=horizontal&safesearch=true&",        
+        images: [],
+        // modalVisible: false,
     }
 
     componentDidUpdate() {
-        // if (this.state.panding) {
+        if (this.state.pending) {
             fetch(
                 `${this.state.mainUrl}?q=${this.state.searchQuery}&page=${this.state.page}&key=${this.state.key}&image_type=photo&orientation=horizontal&per_page=${this.state.pagination}`).then(response => {
                     if (response.ok) {
                         // console.log(response.json())
-                        return response.json()
-                        // console.log(response.json())
-                    }
-                    // return Promise.reject(new Error("Sorry, there are no images matching your search query. Please try again."))
+                        this.setState({ pending: false })
+                        return response.json()                        
+                    }                   
                 }
-                ).then(console.log).catch((error) => this.setState({ error: error })
+            ).then(console.log()).then((img => {
+                console.log(img)
+        if (img.totalHits !== 0)
+             this.setState(            
+            (prevState) => ({
+            images:
+              this.state.page > 1
+                ? [...prevState.images, ...img.hits]
+                : img.hits
+            })               
             )
-        // }
+        })).catch((error) => console.log(error))            
+        }
     };
 
     setQuery = (event) => {
         // console.log(event)
-    this.setState({ searchQuery: event.currentTarget.value })
+        this.setState({ searchQuery: event.currentTarget.value })
     };
     
     searchReset = (event) => {
         event.preventDefault()
-        this.setState({ page: 1, images: [] })
+        this.setState({ pending: true, page: 1, images: [] })
     };
-    render() {
-        return(
-        <div>
-            {/* {this.state.error && <h1>{this.state.error.message}</h1>} */}
-            <Searchbar  
-                setQuery={this.setQuery}    
-                searchQueryValue={this.state.searchQuery}                
-                searchReset={this.searchReset}    
-            />
-        </div>)
-     }
 
-}
-// export default App;
+    nextPage() {
+        this.setState(prevState => ({
+            pending: true,
+            page: prevState.page + 1,
+        }))
+    };
+
+    render() {
+        const { searchQuery, page, pending, images } = this.state;
+        return(
+            <div>               
+                <Searchbar  
+                    setQuery={this.setQuery}    
+                    searchQueryValue={searchQuery}                
+                    searchReset={this.searchReset}    
+                />
+
+                {pending && page === 1 ? <Loader /> : images.length > 0 ? <ImageGallery images={images}  /> : null}
+                
+             
+                
+               { images.length > 0 ? <Button nextPage={ this.nextPage.bind(this) }/> : null}
+            </div>
+        )
+     }
+};
