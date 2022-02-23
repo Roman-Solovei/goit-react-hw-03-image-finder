@@ -4,17 +4,17 @@ import s from "./Modal.module.css"
 
 
 export default class Modal extends Component { 
-    state = {
-        visible: false,
-        modalImg: ""
-    };
+    // state = {
+    //     visible: false,
+    //     modalImg: ""
+    // };
     
-    toggle = (image) => {
-    this.setState(prevState => ({
-        visible: !prevState.visible,
-        modalImg:image
-    }));
-    };
+    // toggle = (image) => {
+    // this.setState(prevState => ({
+    //     visible: !prevState.visible,
+    //     modalImg:image
+    // }));
+    // };
     
     componentDidMount(){
     window.addEventListener('keydown', this.onEscPress)
@@ -22,7 +22,7 @@ export default class Modal extends Component {
 
     onEscPress=(event)=>{
         if (event.code === 'Escape') {
-            this.toggle()
+            this.props.modalToggle()
         }
     }
 
@@ -31,18 +31,25 @@ export default class Modal extends Component {
     }
 
     render() { 
-        const { visible } = this.state;
+        // const { visible } = this.state;
+        console.log(this.props)
         return (
             
             <div className={s.Overlay} onClick={(event) => {
+                console.log(event)
                 if (event.target === event.currentTarget) {
-                    this.toggle()
+                    this.props.modalToggle()
                 }
             }}>
                 <div className={ s.Modal }>
-                <img src="" alt="" />
+                    <img src={ this.props.image } alt={ this.props.tags } />
                 </div>
             </div>
         )
     }
 };
+
+Modal.protoTypes = {
+    modalToggle: PropType.func.isRequired,
+    image:PropType.string.isRequired
+}

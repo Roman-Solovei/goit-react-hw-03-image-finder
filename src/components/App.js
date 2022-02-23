@@ -4,6 +4,7 @@ import Searchbar from "./Searchbar"
 import ImageGallery from "./ImageGallery"
 import Button from "./Button";
 import Loader from "./Loader"
+import Modal from "./Modal";
 // import Modal from "./Modal/Modal"
 
 
@@ -17,7 +18,9 @@ export default class App extends Component {
         mainUrl: "https://pixabay.com/api/",
         searchSettings: "?image_type=photo&orientation=horizontal&safesearch=true&",        
         images: [],
-        // modalVisible: false,
+        modalVisible: false,
+        modalImage: "",
+        modalTags:""
     }
 
     componentDidUpdate() {
@@ -62,21 +65,27 @@ export default class App extends Component {
         }))
     };
 
+    modalToggle = (image, tags) => {
+        console.log(image)
+        console.log(tags)
+        this.setState(prevState => ({ modalVisible: !prevState.modalVisible, modalImage: image, modalTags: tags }))
+    };
+
     render() {
-        const { searchQuery, page, pending, images } = this.state;
+        const { searchQuery, page, pending, images, modalImage, modalTags } = this.state;
         return(
             <div>               
                 <Searchbar  
-                    setQuery={this.setQuery}    
-                    searchQueryValue={searchQuery}                
-                    searchReset={this.searchReset}    
+                    setQuery={ this.setQuery }    
+                    searchQueryValue={ searchQuery }                
+                    searchReset={ this.searchReset }    
                 />
 
-                {pending && page === 1 ? <Loader /> : images.length > 0 ? <ImageGallery images={images}  /> : null}
+                { pending && page === 1 ? <Loader /> : images.length > 0 ? <ImageGallery images={ images } modalToggle={ this.modalToggle } /> : null }    
                 
-             
+                {images.length > 0 ? <Button nextPage={ this.nextPage.bind(this)} /> : null }
                 
-               { images.length > 0 ? <Button nextPage={ this.nextPage.bind(this) }/> : null}
+                {this.state.modalVisible && <Modal modalToggle={ this.modalToggle } image={ modalImage } tags={ modalTags }/> }
             </div>
         )
      }
